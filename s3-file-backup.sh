@@ -1,33 +1,40 @@
 #!/bin/sh
 
+#### s3-file-backup.sh ####
 #### BEGIN CONFIGURATION ####
 
 # set dates for backup rotation
-NOWDATE=`date +%Y%m`
+NOWDATE=$(date +%Y%m)
 LASTDATE=$(date +%Y%m --date='2 months ago')
 
 # set backup directory variables
-SRCDIR='/root/s3backups'
-DESTDIR='domain.com'
-BUCKET='BackupBucket'
+BACKUP="/home/turbowebs/webapps"
+SRCDIR="/home/turbowebs/s3backups"
+DESTDIR="$1/file"
+BUCKET="TurboBackups"
 
 #### END CONFIGURATION ####
+
+# check a parameter was sent
+if [ -z "$1" ]
+then
+    echo "Please include directory to backup as parameter"
+    exit
+fi
 
 # make the temp directory if it doesn't exist
 mkdir -p $SRCDIR
 
-# generate code backup of the public_html directory
-cd /home/
-tar -czf $NOWDATE-file-backup.tar.gz public_html/
-mv $NOWDATE-file-backup.tar.gz $SRCDIR
-cd $SRCDIR
+# generate file backup of the public_html directory
+cd $BACKUP || exit
+tar -czf "$SRCDIR/$NOWDATE-file-backup.tar.gz" "$1"
+cd $SRCDIR || exit
 
 # upload backup to s3
-s3cmd put $SRCDIR/$NOWDATE-file-backup.tar.gz s3://$BUCKET/$DESTDIR/
+aws s3 cp "$SRCDIR/$NOWDATE-file-backup.tar.gz" "s3://$BUCKET/$DESTDIR/"
 
 # delete old backups from s3
-s3cmd del --recursive s3://$BUCKET/$DESTDIR/$LASTDATE-file-backup.tar.gz
+aws s3 rm "s3://$BUCKET/$DESTDIR/$LASTDATE-file-backup.tar.gz"
 
 # remove all files in our source directory
-cd
 rm -f $SRCDIR/*
