@@ -8,8 +8,8 @@ NOWDATE=$(date +%Y%m%d)
 LASTDATE=$(date +%Y%m%d --date='4 weeks ago')
 
 # set backup directory variables
-MYUSER=""
-MYPASS=""
+MYUSER="$2"
+MYPASS="$3"
 SRCDIR="/home/turbowebs/s3backups"
 DESTDIR="$1/db"
 BUCKET="TurboBackups"
