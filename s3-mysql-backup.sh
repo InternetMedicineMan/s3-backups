@@ -11,6 +11,7 @@ LASTDATE=$(date +%Y%m%d --date='4 weeks ago')
 MYUSER="$2"
 MYPASS="$3"
 SRCDIR="/home/turbowebs/s3backups"
+BINDIR="/home/turbowebs/bin"
 DESTDIR="$1/db"
 BUCKET="TurboBackups"
 
@@ -38,10 +39,10 @@ cd $SRCDIR || exit
 tar -czPf "$NOWDATE-db-backup.tar.gz" ./*.sql
 
 # upload backup to s3
-aws s3 cp "$NOWDATE-db-backup.tar.gz" "s3://$BUCKET/$DESTDIR/"
+$BINDIR/aws s3 cp "$NOWDATE-db-backup.tar.gz" "s3://$BUCKET/$DESTDIR/"
 
 # delete old backups from s3
-aws s3 rm "s3://$BUCKET/$DESTDIR/$LASTDATE-db-backup.tar.gz"
+$BINDIR/aws s3 rm "s3://$BUCKET/$DESTDIR/$LASTDATE-db-backup.tar.gz"
 
 # remove all files in our source directory
 rm -f $SRCDIR/*
