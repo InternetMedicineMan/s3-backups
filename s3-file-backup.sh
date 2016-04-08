@@ -10,6 +10,7 @@ LASTDATE=$(date +%Y%m --date='2 months ago')
 # set backup directory variables
 BACKUP="/home/turbowebs/webapps"
 SRCDIR="/home/turbowebs/s3backups"
+BINDIR="/home/turbowebs/bin"
 DESTDIR="$1/file"
 BUCKET="TurboBackups"
 
@@ -31,10 +32,10 @@ tar -czf "$SRCDIR/$NOWDATE-file-backup.tar.gz" "$1"
 cd $SRCDIR || exit
 
 # upload backup to s3
-aws s3 cp "$SRCDIR/$NOWDATE-file-backup.tar.gz" "s3://$BUCKET/$DESTDIR/"
+$BINDIR/aws s3 cp "$SRCDIR/$NOWDATE-file-backup.tar.gz" "s3://$BUCKET/$DESTDIR/"
 
 # delete old backups from s3
-aws s3 rm "s3://$BUCKET/$DESTDIR/$LASTDATE-file-backup.tar.gz"
+$BINDIR/aws s3 rm "s3://$BUCKET/$DESTDIR/$LASTDATE-file-backup.tar.gz"
 
 # remove all files in our source directory
 rm -f $SRCDIR/*
